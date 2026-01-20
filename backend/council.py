@@ -15,14 +15,33 @@ async def stage1_collect_responses(user_query: str) -> List[Dict[str, Any]]:
     Returns:
         List of dicts with 'model' and 'response' keys
     """
-    messages = [{"role": "user", "content": user_query}]
-
-    # Query all models in parallel
-    responses = await query_models_parallel(COUNCIL_MODELS, messages)
+    # AI Safety & Governance intervention: Role-based prompts to reduce correlated failures
+    SAFETY_ROLES = {
+        "openai/gpt-5.2": "You are a cautious AI safety reviewer. Prioritize accuracy, uncertainty awareness, and harm minimization.",
+        "anthropic/claude-sonnet-4.5": "You are an ethical analyst focused on alignment, responsible AI behavior, and downstream impacts.",
+        "google/gemini-3-pro-preview": "You are a systems thinker optimizing clarity, robustness, and failure-mode coverage.",
+        "x-ai/grok-4": "You are a critical adversarial reviewer actively searching for flaws, edge cases, and hidden risks."
+    }
+    
+    # Query each model with its role-specific prompt
+    import asyncio
+    tasks = []
+    for model in COUNCIL_MODELS:
+        # Construct role-aware query (prepend role description if defined)
+        if model in SAFETY_ROLES:
+            content = f"{SAFETY_ROLES[model]}\n\n{user_query}"
+        else:
+            content = user_query
+        
+        messages = [{"role": "user", "content": content}]
+        tasks.append(query_model(model, messages))
+    
+    # Execute all queries in parallel
+    responses = await asyncio.gather(*tasks)
 
     # Format results
     stage1_results = []
-    for model, response in responses.items():
+    for model, response in zip(COUNCIL_MODELS, responses):
         if response is not None:  # Only include successful responses
             stage1_results.append({
                 "model": model,
