@@ -1,6 +1,8 @@
 LLM Governance Council
 
-![LLM Governance Council](assets/llm-governance-council-header.png)
+![LLM Governance Council](assets/images/LlM%20Governance%20Council%20.png)
+
+**A Local Multi-Model AI Governance & Decision Framework**
 
 A research prototype for Minimum Viable AI Governance via multi-model deliberation
 
@@ -124,11 +126,18 @@ cd ..
 
 Create a .env file in the project root:
 
-OPENROUTER_API_KEY=sk-or-v1-...
+OPENROUTER_API_KEY=your_api_key_here
 
 
 Obtain an API key from openrouter.ai
  and ensure sufficient credits are available.
+
+You can copy the template file:
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and replace `your_api_key_here` with your actual OpenRouter API key.
 
 3. Configure Models (Optional)
 
