@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Stage1 from './Stage1';
+import Stage1_5 from './Stage1_5';
 import Stage2 from './Stage2';
 import Stage3 from './Stage3';
 import './ChatInterface.css';
@@ -76,10 +77,25 @@ export default function ChatInterface({
                   {msg.loading?.stage1 && (
                     <div className="stage-loading">
                       <div className="spinner"></div>
-                      <span>Running Stage 1: Collecting individual responses...</span>
+                      <span>Running Stage 1: Collecting individual responses (Round 1)...</span>
                     </div>
                   )}
                   {msg.stage1 && <Stage1 responses={msg.stage1} />}
+
+                  {/* Stage 1.5: Delphi Reflection */}
+                  {msg.loading?.stage1_5 && (
+                    <div className="stage-loading delphi-loading">
+                      <div className="spinner"></div>
+                      <span>Running Stage 1.5: Delphi Reflection Round (models reviewing peer feedback)...</span>
+                    </div>
+                  )}
+                  {msg.stage1_5 && (
+                    <Stage1_5
+                      delphiResults={msg.stage1_5}
+                      needsHumanReview={msg.metadata?.needs_human_review}
+                      councilMembers={msg.metadata?.council_members}
+                    />
+                  )}
 
                   {/* Stage 2 */}
                   {msg.loading?.stage2 && (
@@ -92,6 +108,8 @@ export default function ChatInterface({
                     <Stage2
                       rankings={msg.stage2}
                       labelToModel={msg.metadata?.label_to_model}
+                      responseMapping={msg.metadata?.response_mapping}
+                      councilMembers={msg.metadata?.council_members}
                       aggregateRankings={msg.metadata?.aggregate_rankings}
                     />
                   )}

@@ -85,6 +85,12 @@
   font-style: italic;
 }
 
+.stage-loading.delphi-loading {
+  background: #f9f7ff;
+  border-color: #8b7fc7;
+  color: #8b7fc7;
+}
+
 .spinner {
   width: 20px;
   height: 20px;

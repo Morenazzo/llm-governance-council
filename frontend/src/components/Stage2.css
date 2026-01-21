@@ -20,6 +20,90 @@
   line-height: 1.5;
 }
 
+/* Mapping Legend */
+.mapping-legend {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.legend-title {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  margin: 0 0 12px 0;
+  font-style: italic;
+}
+
+.mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.mapping-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mapping-label {
+  font-weight: 700;
+  color: #764ba2;
+  font-size: 14px;
+  padding: 4px 8px;
+  background: #f0e6ff;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.mapping-arrow {
+  color: #764ba2;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.mapping-model {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mapping-model .model-short {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.mapping-model .model-role {
+  color: #764ba2;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.mapping-model .model-full {
+  font-family: monospace;
+  color: #666;
+  font-size: 11px;
+}
+
 .aggregate-rankings {
   background: #f0f7ff;
   padding: 16px;
@@ -57,12 +141,24 @@
   min-width: 35px;
 }
 
-.rank-model {
+.rank-model-info {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rank-model {
   color: #333;
   font-family: monospace;
   font-size: 14px;
   font-weight: 500;
+}
+
+.rank-role {
+  color: #764ba2;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .rank-score {
@@ -113,9 +209,11 @@
 
 .ranking-model {
   color: #888;
-  font-size: 12px;
+  font-size: 13px;
   font-family: monospace;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .ranking-content {
@@ -124,27 +222,157 @@
   font-size: 14px;
 }
 
-.parsed-ranking {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 2px solid #e0e0e0;
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 8px 0;
+  color: #333;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.parsed-ranking strong {
+.section-icon {
+  font-size: 18px;
+}
+
+.section-description {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Evaluation Section - Anonymous */
+.evaluation-section {
+  margin-bottom: 24px;
+}
+
+.evaluation-section .section-header {
+  color: #555;
+}
+
+/* Final Ranking Section - De-anonymized */
+.final-ranking-section {
+  background: #f8fbff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #4a90e2;
+}
+
+.final-ranking-section .section-header {
   color: #2a7ae2;
-  font-size: 13px;
+  margin-top: 0;
 }
 
-.parsed-ranking ol {
+.final-ranking-list {
   margin: 8px 0 0 0;
   padding-left: 24px;
-  color: #333;
+  list-style-type: decimal;
 }
 
-.parsed-ranking li {
-  margin: 4px 0;
+.final-ranking-item {
+  margin: 12px 0;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #d0e7ff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.final-ranking-item .rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.final-ranking-item .model-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.final-ranking-item .model-name-short {
+  font-weight: 700;
+  color: #2a7ae2;
+  font-size: 18px;
+}
+
+.final-ranking-item .model-role {
+  color: #764ba2;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.final-ranking-item .anonymous-label {
+  color: #888;
+  font-size: 12px;
+  font-style: italic;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.final-ranking-item .model-details {
+  margin-bottom: 10px;
+}
+
+.final-ranking-item .model-path {
+  color: #666;
   font-family: monospace;
-  font-size: 13px;
+  font-size: 11px;
+}
+
+.final-ranking-item .rationale {
+  background: #f8fbff;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 3px solid #4a90e2;
+  display: flex;
+  gap: 8px;
+}
+
+.final-ranking-item .rationale-label {
+  font-weight: 600;
+  color: #2a7ae2;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.final-ranking-item .rationale-text {
+  color: #555;
+  font-size: 12px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* Extracted Ranking Section - Machine-Readable */
+.extracted-ranking-section {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px dashed #999;
+}
+
+.extracted-ranking-section .section-header {
+  color: #555;
+  margin-top: 0;
+}
+
+.machine-readable-format {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  margin: 8px 0 0 0;
+  line-height: 1.5;
 }
 
 .rank-count {

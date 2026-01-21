@@ -62,11 +62,13 @@ LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively
 - ReactMarkdown rendering with markdown-content wrapper
 
 **`components/Stage2.jsx`**
-- **Critical Feature**: Tab view showing RAW evaluation text from each model
-- De-anonymization happens CLIENT-SIDE for display (models receive anonymous labels)
-- Shows "Extracted Ranking" below each evaluation so users can validate parsing
+- **Critical Feature**: Tab view with THREE distinct sections:
+  1. **Internal Deliberation (Anonymized)**: Raw evaluation text preserving anonymous labels (Response A, B, C, etc.)
+  2. **Final Ranking (De-anonymized)**: Shows both model names and their anonymous labels (e.g., "gpt-5.2 (Response A)")
+  3. **Extracted Ranking (Machine-Readable)**: JSON format for downstream processing
+- De-anonymization happens CLIENT-SIDE for display (models receive anonymous labels during deliberation)
 - Aggregate rankings shown with average position and vote count
-- Explanatory text clarifies that boldface model names are for readability only
+- Clear semantic distinction between anonymized deliberation and final labeled outputs
 
 **`components/Stage3.jsx`**
 - Final synthesized answer from chairman
@@ -92,11 +94,12 @@ The Stage 2 prompt is very specific to ensure parseable output:
 This strict format allows reliable parsing while still getting thoughtful evaluations.
 
 ### De-anonymization Strategy
-- Models receive: "Response A", "Response B", etc.
-- Backend creates mapping: `{"Response A": "openai/gpt-5.1", ...}`
-- Frontend displays model names in **bold** for readability
-- Users see explanation that original evaluation used anonymous labels
-- This prevents bias while maintaining transparency
+- Models receive: "Response A", "Response B", etc. (fully anonymous during deliberation)
+- Backend creates mapping: `{"Response A": "openai/gpt-5.2", ...}`
+- Frontend preserves anonymized text in "Internal Deliberation" section
+- "Final Ranking" section shows de-anonymized mapping: model names with original labels
+- "Extracted Ranking" provides structured JSON format for programmatic use
+- This prevents bias during deliberation while maintaining full transparency afterward
 
 ### Error Handling Philosophy
 - Continue with successful responses if some models fail (graceful degradation)
@@ -105,9 +108,13 @@ This strict format allows reliable parsing while still getting thoughtful evalua
 
 ### UI/UX Transparency
 - All raw outputs are inspectable via tabs
-- Parsed rankings shown below raw text for validation
-- Users can verify system's interpretation of model outputs
+- Three distinct output sections with clear purposes:
+  - **Internal Deliberation**: Shows unmodified anonymous reasoning
+  - **Final Ranking**: Human-readable mapping of ranks to models
+  - **Extracted Ranking**: Machine-readable structured data
+- Users can verify both the anonymous deliberation and final attribution
 - This builds trust and allows debugging of edge cases
+- Semantic distinction prevents confusion between deliberation process and final results
 
 ## Important Implementation Details
 

@@ -10,7 +10,8 @@ import json
 import asyncio
 
 from . import storage
-from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage1_5_delphi_reflection, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+from .config import DELPHI_MODE
 
 app = FastAPI(title="LLM Council API")
 
@@ -77,6 +78,15 @@ async def get_conversation(conversation_id: str):
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return conversation
+
+
+@app.delete("/api/conversations/{conversation_id}")
+async def delete_conversation(conversation_id: str):
+    """Delete a conversation."""
+    deleted = storage.delete_conversation(conversation_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return {"status": "deleted", "id": conversation_id}
 
 
 @app.post("/api/conversations/{conversation_id}/message")
@@ -147,20 +157,40 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             if is_first_message:
                 title_task = asyncio.create_task(generate_conversation_title(request.content))
 
-            # Stage 1: Collect responses
+            # Stage 1: Collect responses and create CouncilMember objects
             yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
-            stage1_results = await stage1_collect_responses(request.content)
+            stage1_results, council_members = await stage1_collect_responses(request.content)
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
 
-            # Stage 2: Collect rankings
+            # Stage 1.5 (Optional): Delphi Reflection Round
+            delphi_results = None
+            needs_human_review = False
+            
+            if DELPHI_MODE:
+                yield f"data: {json.dumps({'type': 'stage1_5_start'})}\n\n"
+                delphi_results, needs_human_review = await stage1_5_delphi_reflection(request.content, stage1_results, council_members)
+                yield f"data: {json.dumps({'type': 'stage1_5_complete', 'data': delphi_results, 'metadata': {'needs_human_review': needs_human_review}})}\n\n"
+            
+            # Prepare input for ranking
+            ranking_input = stage1_results
+            if DELPHI_MODE and delphi_results:
+                ranking_input = [
+                    {"member_id": r["member_id"], "model": r["model"], "response": r["round2_response"]}
+                    for r in delphi_results
+                ]
+
+            # Stage 2: Collect rankings (using CouncilMember objects)
             yield f"data: {json.dumps({'type': 'stage2_start'})}\n\n"
-            stage2_results, label_to_model = await stage2_collect_rankings(request.content, stage1_results)
-            aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
-            yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings}})}\n\n"
+            stage2_results, mapping_metadata = await stage2_collect_rankings(request.content, ranking_input, council_members)
+            council_members_dict = mapping_metadata["council_members"]
+            response_mapping = mapping_metadata["response_mapping"]
+            label_to_model = mapping_metadata["label_to_model"]
+            aggregate_rankings = calculate_aggregate_rankings(stage2_results, response_mapping)
+            yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'council_members': council_members_dict, 'response_mapping': response_mapping, 'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings, 'delphi_mode': DELPHI_MODE}})}\n\n"
 
             # Stage 3: Synthesize final answer
             yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
-            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results)
+            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results, delphi_results=delphi_results, needs_human_review=needs_human_review)
             yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
 
             # Wait for title generation if it was started

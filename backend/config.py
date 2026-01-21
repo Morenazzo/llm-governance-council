@@ -24,3 +24,7 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Data directory for conversation storage
 DATA_DIR = "data/conversations"
+
+# Delphi Mode - Enable iterative reflection rounds
+# Set to True to enable Stage 1.5 where models can revise after seeing peer feedback
+DELPHI_MODE = os.getenv("DELPHI_MODE", "false").lower() == "true"
