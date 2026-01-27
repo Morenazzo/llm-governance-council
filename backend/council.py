@@ -43,12 +43,23 @@ class CouncilMember:
 # =========================
 
 # NOTE: Make sure these keys match your COUNCIL_MODELS values exactly.
+# For Mistral, we match any model ID containing "mistral"
 GOVERNANCE_ROLES = {
     "openai/gpt-5.2": "Regulator",
     "anthropic/claude-sonnet-4.5": "Ethics Officer",
     "google/gemini-3-pro-preview": "Systems Architect",
     "x-ai/grok-4": "Red Team",
 }
+
+def get_governance_role(model: str) -> str:
+    """Get governance role for a model, with fallback for Mistral variants."""
+    # Check exact match first
+    if model in GOVERNANCE_ROLES:
+        return GOVERNANCE_ROLES[model]
+    # Check if it's a Mistral variant
+    if "mistral" in model.lower():
+        return "Safety Engineer"
+    return "Council Member"
 
 
 # =========================
@@ -81,10 +92,23 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
             "You are a critical adversarial reviewer actively searching for flaws, edge cases, and hidden risks."
         ),
     }
+    
+    # Mistral role definition (matches any model ID containing "mistral")
+    MISTRAL_ROLE = (
+        "You are a Safety Engineer focused on Shadow AI & Data Leakage prevention. "
+        "Your expertise is in technical controls: AI gateways, DLP/redaction, allowlisting, "
+        "logging/audit trails, and kill switches. For each recommendation, provide: "
+        "(1) technical risks, (2) specific controls/guardrails, (3) evidence/logging requirements, "
+        "(4) testing procedures, and (5) go/no-go recommendation with justification."
+    )
 
     tasks = []
     for model in COUNCIL_MODELS:
+        # Get role prefix - check exact match first, then Mistral fallback
         role_prefix = SAFETY_ROLES.get(model)
+        if not role_prefix and "mistral" in model.lower():
+            role_prefix = MISTRAL_ROLE
+        
         content = f"{role_prefix}\n\n{user_query}" if role_prefix else user_query
         messages = [{"role": "user", "content": content}]
         tasks.append(query_model(model, messages))
@@ -105,7 +129,7 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
         member = CouncilMember(
             id=member_id,
             model=model,
-            role=GOVERNANCE_ROLES.get(model, "Council Member"),
+            role=get_governance_role(model),
         )
         council_members.append(member)
 

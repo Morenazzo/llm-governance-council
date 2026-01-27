@@ -24,6 +24,8 @@ async def query_model(
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/Morenazzo/llm-governance-council",
+        "X-Title": "LLM Governance Council",
     }
 
     payload = {

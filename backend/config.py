@@ -8,12 +8,16 @@ load_dotenv()
 # OpenRouter API key
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+# Mistral model - configurable via environment
+MISTRAL_MODEL_ID = os.getenv("MISTRAL_MODEL_ID", "mistralai/mistral-large-2407")
+
 # Council members - list of OpenRouter model identifiers
 COUNCIL_MODELS = [
     "openai/gpt-5.2",
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
     "x-ai/grok-4",
+    MISTRAL_MODEL_ID,
 ]
 
 # Chairman model - synthesizes final response

@@ -148,9 +148,50 @@ COUNCIL_MODELS = [
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
     "x-ai/grok-4",
+    MISTRAL_MODEL_ID,  # Mistral model (configurable)
 ]
 
 CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+
+### Mistral Integration
+
+Mistral is included as the **Safety Engineer** focused on Shadow AI & Data Leakage prevention. Mistral's role emphasizes technical controls:
+- AI gateways and allowlisting
+- DLP (Data Loss Prevention) and redaction
+- Logging and audit trails
+- Kill switches and emergency controls
+- Go/no-go recommendations with evidence
+
+**Configure Mistral Model:**
+
+You can specify which Mistral model to use via the `MISTRAL_MODEL_ID` environment variable in your `.env` file:
+
+```bash
+# Default model (if not specified)
+MISTRAL_MODEL_ID=mistralai/mistral-large-2407
+
+# Other options available on OpenRouter:
+# MISTRAL_MODEL_ID=mistralai/mistral-medium
+# MISTRAL_MODEL_ID=mistralai/mistral-small
+```
+
+See [OpenRouter Models](https://openrouter.ai/models) for all available Mistral variants.
+
+**Test Mistral Integration:**
+
+Run the included test script to verify Mistral is working correctly:
+
+```bash
+python test_mistral.py
+```
+
+This test will:
+1. Verify Mistral responds via OpenRouter
+2. Check that the Safety Engineer role is active
+3. Ensure other council members still work (graceful degradation)
+4. Run a Shadow AI governance test prompt
+
+**Note:** Only one API key (OpenRouter) is required. All models, including Mistral, use OpenRouter as the gateway.
 
 Running the Application
 Option 1 — Start Script
