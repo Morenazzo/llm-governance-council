@@ -11,8 +11,9 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 # Mistral model - configurable via environment
 MISTRAL_MODEL_ID = os.getenv("MISTRAL_MODEL_ID", "mistralai/mistral-large-2407")
 
-# ChatGPT model - configurable via environment
-CHATGPT_MODEL_ID = os.getenv("CHATGPT_MODEL_ID", "openai/chatgpt-4o-latest")
+# ChatGPT-5.2 model - CRITICAL: Do NOT downgrade to 4o
+# This model was intentionally selected for superior reasoning quality
+CHATGPT_MODEL_ID = os.getenv("CHATGPT_MODEL_ID", "openai/chatgpt-5.2")
 
 # Council members - list of OpenRouter model identifiers
 COUNCIL_MODELS = [

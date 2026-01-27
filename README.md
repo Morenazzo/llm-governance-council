@@ -159,7 +159,7 @@ The council consists of **5 specialized AI models**, each with a unique governan
 
 | Model | Role | Focus Area | Stages |
 |-------|------|------------|--------|
-| **ChatGPT-4o** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
+| **ChatGPT-5.2** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
 | **Gemini 3 Pro** | Systems Architect + Chairman | Architecture + final synthesis | 1, Delphi, 2, **3** |
 | **Claude Sonnet** | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
 | **Grok 4** | Red Team | Adversarial review | 1, Delphi, 2 |
@@ -179,20 +179,25 @@ ChatGPT serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on
 - Resilience strategies
 - System-wide impact assessment
 
-**Configure ChatGPT Model:**
+**Configure ChatGPT-5.2 Model:**
 
-You can specify which ChatGPT model to use via the `CHATGPT_MODEL_ID` environment variable in your `.env` file:
+**CRITICAL**: ChatGPT-5.2 is intentionally selected for superior reasoning quality and systems analysis.
 
 ```bash
-# Default model (continually updated with latest RLHF)
-CHATGPT_MODEL_ID=openai/chatgpt-4o-latest
+# Default model - DO NOT change unless you have confirmed access
+CHATGPT_MODEL_ID=openai/chatgpt-5.2
 
-# Other options available on OpenRouter:
-# CHATGPT_MODEL_ID=openai/gpt-4o          # Stable version
-# CHATGPT_MODEL_ID=openai/gpt-4-turbo     # Previous generation
+# WARNING: Do NOT downgrade to chatgpt-4o
+# Downgrading reduces failure-mode analysis quality
 ```
 
-See [OpenRouter Models](https://openrouter.ai/models) for all available OpenAI models.
+**Note**: ChatGPT-5.2 provides advanced reasoning capabilities critical for:
+- Complex system failure analysis
+- Multi-component integration risk assessment
+- Cascade effect prediction
+- Deep systems thinking
+
+Only modify if you have access to a different GPT-5 variant via OpenRouter.
 
 ### Mistral Integration
 
