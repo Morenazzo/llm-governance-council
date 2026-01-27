@@ -1,4 +1,4 @@
-"""FastAPI backend for LLM Council."""
+"""FastAPI backend for LLM Governance Council."""
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +13,7 @@ from . import storage
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage1_5_delphi_reflection, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
 from .config import DELPHI_MODE
 
-app = FastAPI(title="LLM Council API")
+app = FastAPI(title="LLM Governance Council API")
 
 # Enable CORS for local development
 app.add_middleware(
@@ -54,7 +54,7 @@ class Conversation(BaseModel):
 @app.get("/")
 async def root():
     """Health check endpoint."""
-    return {"status": "ok", "service": "LLM Council API"}
+    return {"status": "ok", "service": "LLM Governance Council API"}
 
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])

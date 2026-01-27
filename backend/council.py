@@ -1,4 +1,4 @@
-"""3-stage LLM Council orchestration (with optional Delphi Round)."""
+"""3-stage LLM Governance Council orchestration (with optional Delphi Round)."""
 
 from typing import List, Dict, Any, Tuple, Optional
 from dataclasses import dataclass, asdict
