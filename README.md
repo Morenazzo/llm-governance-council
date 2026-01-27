@@ -144,14 +144,55 @@ Then edit `.env` and replace `your_api_key_here` with your actual OpenRouter API
 You can customize council members and the Chairman in backend/config.py:
 
 COUNCIL_MODELS = [
-    "openai/gpt-5.2",
+    CHATGPT_MODEL_ID,   # ChatGPT model (configurable)
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
     "x-ai/grok-4",
-    MISTRAL_MODEL_ID,  # Mistral model (configurable)
+    MISTRAL_MODEL_ID,   # Mistral model (configurable)
 ]
 
 CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+
+### Council Members & Roles
+
+The council consists of **5 specialized AI models**, each with a unique governance role:
+
+| Model | Role | Focus Area | Stages |
+|-------|------|------------|--------|
+| **ChatGPT-4o** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
+| **Gemini 3 Pro** | Systems Architect + Chairman | Architecture + final synthesis | 1, Delphi, 2, **3** |
+| **Claude Sonnet** | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
+| **Grok 4** | Red Team | Adversarial review | 1, Delphi, 2 |
+| **Mistral Large** | Safety Engineer | Technical controls | 1, Delphi, 2 |
+
+**Key Points**:
+- All 5 models participate in Stage 1 (individual responses), Delphi (iterative reflection), and Stage 2 (peer rankings)
+- Only Gemini serves as Chairman for Stage 3 (final synthesis)
+- Each model brings a specialized perspective to reduce correlated failures
+
+### ChatGPT Integration
+
+ChatGPT serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on:
+- Integration risks and cross-component dependencies
+- Failure mode identification and cascade effects
+- Fault propagation paths
+- Resilience strategies
+- System-wide impact assessment
+
+**Configure ChatGPT Model:**
+
+You can specify which ChatGPT model to use via the `CHATGPT_MODEL_ID` environment variable in your `.env` file:
+
+```bash
+# Default model (continually updated with latest RLHF)
+CHATGPT_MODEL_ID=openai/chatgpt-4o-latest
+
+# Other options available on OpenRouter:
+# CHATGPT_MODEL_ID=openai/gpt-4o          # Stable version
+# CHATGPT_MODEL_ID=openai/gpt-4-turbo     # Previous generation
+```
+
+See [OpenRouter Models](https://openrouter.ai/models) for all available OpenAI models.
 
 ### Mistral Integration
 

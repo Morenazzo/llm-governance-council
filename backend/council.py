@@ -43,19 +43,21 @@ class CouncilMember:
 # =========================
 
 # NOTE: Make sure these keys match your COUNCIL_MODELS values exactly.
-# For Mistral, we match any model ID containing "mistral"
+# For ChatGPT and Mistral, we match any model ID containing the keyword
 GOVERNANCE_ROLES = {
-    "openai/gpt-5.2": "Regulator",
     "anthropic/claude-sonnet-4.5": "Ethics Officer",
     "google/gemini-3-pro-preview": "Systems Architect",
     "x-ai/grok-4": "Red Team",
 }
 
 def get_governance_role(model: str) -> str:
-    """Get governance role for a model, with fallback for Mistral variants."""
+    """Get governance role for a model, with fallbacks for ChatGPT and Mistral variants."""
     # Check exact match first
     if model in GOVERNANCE_ROLES:
         return GOVERNANCE_ROLES[model]
+    # Check if it's a ChatGPT variant (openai/chatgpt-* or openai/gpt-*)
+    if "openai/" in model.lower() and ("chatgpt" in model.lower() or "gpt" in model.lower()):
+        return "Systems Integrator"
     # Check if it's a Mistral variant
     if "mistral" in model.lower():
         return "Safety Engineer"
@@ -77,21 +79,26 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
     """
     # Role-aware prompts to reduce correlated failure modes.
     SAFETY_ROLES = {
-        "openai/gpt-5.2": (
-            "You are a cautious AI safety reviewer. Prioritize accuracy, uncertainty awareness, "
-            "and harm minimization."
-        ),
         "anthropic/claude-sonnet-4.5": (
             "You are an ethical analyst focused on alignment, responsible AI behavior, and "
             "downstream impacts."
         ),
         "google/gemini-3-pro-preview": (
-            "You are a systems thinker optimizing clarity, robustness, and failure-mode coverage."
+            "You are a systems architect optimizing for clarity, robustness, and comprehensive "
+            "system design. You will also serve as the Chairman to synthesize final recommendations."
         ),
         "x-ai/grok-4": (
             "You are a critical adversarial reviewer actively searching for flaws, edge cases, and hidden risks."
         ),
     }
+    
+    # ChatGPT role definition (matches openai/chatgpt-* or openai/gpt-*)
+    CHATGPT_ROLE = (
+        "You are a Systems Integrator & Failure-Mode Analyst. Your expertise is in identifying how "
+        "different components interact, where integration points fail, and what cascade failures might occur. "
+        "For each analysis, provide: (1) integration risks and failure modes, (2) cross-component dependencies, "
+        "(3) fault propagation paths, (4) resilience strategies, and (5) system-wide impact assessment."
+    )
     
     # Mistral role definition (matches any model ID containing "mistral")
     MISTRAL_ROLE = (
@@ -104,10 +111,16 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
 
     tasks = []
     for model in COUNCIL_MODELS:
-        # Get role prefix - check exact match first, then Mistral fallback
+        # Get role prefix - check exact match first, then ChatGPT/Mistral fallbacks
         role_prefix = SAFETY_ROLES.get(model)
-        if not role_prefix and "mistral" in model.lower():
-            role_prefix = MISTRAL_ROLE
+        
+        if not role_prefix:
+            # Check for ChatGPT variants
+            if "openai/" in model.lower() and ("chatgpt" in model.lower() or "gpt" in model.lower()):
+                role_prefix = CHATGPT_ROLE
+            # Check for Mistral variants
+            elif "mistral" in model.lower():
+                role_prefix = MISTRAL_ROLE
         
         content = f"{role_prefix}\n\n{user_query}" if role_prefix else user_query
         messages = [{"role": "user", "content": content}]
