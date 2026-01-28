@@ -301,6 +301,39 @@ When Delphi Mode is enabled, a new Stage 1.5 is inserted between Stage 1 and Sta
 
 **Recommendation**: Use Delphi Mode for complex, high-stakes governance decisions where superior analysis quality justifies the longer wait time.
 
+### Reference Documents
+
+The system supports attaching reference documents/policies as context for analysis.
+
+**How to Use:**
+
+1. Click "Reference Documents" to expand the section
+2. Click "+ Add Document"
+3. Provide a title (e.g., "Company AI Policy Draft")
+4. Paste the document content
+5. Click "Add Document"
+
+**Features:**
+- Multiple documents supported
+- Document preview and management
+- Remove documents individually
+- Documents persist for follow-up questions
+- Automatically included in council analysis
+
+**Important:**
+- ⚠️ **Do NOT upload confidential information**
+- Sanitize and anonymize all content
+- Documents are sent to third-party AI providers
+- See [DISCLAIMER.md](DISCLAIMER.md) for full data privacy warnings
+
+**Use Cases:**
+- Company policies for context
+- Regulatory requirements
+- Industry guidelines
+- Draft policies for review
+- Technical constraints
+- Organizational requirements
+
 Running the Application
 Option 1 — Start Script
 ./start.sh
