@@ -293,12 +293,20 @@ The system supports attaching reference documents/policies as context for analys
 **How to Use:**
 
 1. Click "Reference Documents" to expand the section
-2. Click "+ Add Document"
-3. Provide a title (e.g., "Company AI Policy Draft")
-4. Paste the document content
-5. Click "Add Document"
+2. Choose one of two options:
+   - **📁 Upload File**: Select a file from your computer (.txt, .md, .csv, .json, .xml, .yaml, .pdf)
+   - **✏️ Paste Text**: Manually paste document content
+3. Review/edit the auto-filled title and content
+4. Click "Add Document"
+
+**Supported File Formats:**
+- ✅ Text files (.txt, .md)
+- ✅ Data files (.csv, .json, .xml, .yaml, .yml)
+- ⚠️ PDF files (.pdf) - limited text extraction
+- ❌ Word documents (.doc, .docx) - copy-paste text instead
 
 **Features:**
+- Upload files directly from your computer
 - Multiple documents supported
 - Document preview and management
 - Remove documents individually

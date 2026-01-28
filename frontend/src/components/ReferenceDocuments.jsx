@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import './ReferenceDocuments.css';
 
 export default function ReferenceDocuments({ onDocumentsChange }) {
@@ -7,6 +7,50 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
   const [newDocTitle, setNewDocTitle] = useState('');
   const [newDocContent, setNewDocContent] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      let content = '';
+
+      // Handle different file types
+      if (['txt', 'md', 'csv', 'json', 'xml', 'yaml', 'yml'].includes(fileExtension)) {
+        // Text-based files
+        content = await file.text();
+      } else if (fileExtension === 'pdf') {
+        // For PDF, we'll try to extract text (basic approach)
+        alert('PDF files are supported but text extraction may be limited. For best results, copy-paste text from your PDF reader.');
+        content = await file.text(); // This won't work well for PDFs, but better than nothing
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        alert('Word documents (.doc, .docx) are not directly supported. Please copy-paste the text or save as .txt first.');
+        setIsUploading(false);
+        event.target.value = ''; // Reset file input
+        return;
+      } else {
+        // Try to read as text anyway
+        content = await file.text();
+      }
+
+      // Auto-fill form with file content
+      setNewDocTitle(file.name);
+      setNewDocContent(content);
+      setShowAddForm(true);
+
+    } catch (error) {
+      console.error('Error reading file:', error);
+      alert('Error reading file. Please try copying and pasting the content instead.');
+    } finally {
+      setIsUploading(false);
+      event.target.value = ''; // Reset file input
+    }
+  };
 
   const handleAddDocument = () => {
     if (!newDocTitle.trim() || !newDocContent.trim()) {
@@ -96,12 +140,29 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
           )}
 
           {!showAddForm ? (
-            <button
-              className="add-document-btn"
-              onClick={() => setShowAddForm(true)}
-            >
-              + Add Document
-            </button>
+            <div className="add-document-options">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt,.md,.csv,.json,.xml,.yaml,.yml,.pdf,.doc,.docx"
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+              />
+              <button
+                className="upload-file-btn"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? '📤 Uploading...' : '📁 Upload File'}
+              </button>
+              <span className="option-separator">or</span>
+              <button
+                className="add-document-btn"
+                onClick={() => setShowAddForm(true)}
+              >
+                ✏️ Paste Text
+              </button>
+            </div>
           ) : (
             <div className="add-document-form">
               <input
