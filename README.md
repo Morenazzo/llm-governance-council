@@ -299,11 +299,17 @@ The system supports attaching reference documents/policies as context for analys
 3. Review/edit the auto-filled title and content
 4. Click "Add Document"
 
+**File Size Limits:**
+- **Maximum file size**: 5 MB
+- **Recommended character limit**: ~100,000 characters (approximately 25-50 pages)
+- **Larger documents**: System will warn and ask for confirmation
+- **Best practice**: Upload only relevant sections to stay within limits
+
 **Supported File Formats:**
-- ✅ Text files (.txt, .md)
-- ✅ Data files (.csv, .json, .xml, .yaml, .yml)
-- ⚠️ PDF files (.pdf) - limited text extraction
-- ❌ Word documents (.doc, .docx) - copy-paste text instead
+- ✅ Text files (.txt, .md) - Full support
+- ✅ Data files (.csv, .json, .xml, .yaml, .yml) - Full support
+- ⚠️ PDF files (.pdf) - Limited text extraction (copy-paste recommended)
+- ❌ Word documents (.doc, .docx) - Not supported (copy-paste text instead)
 
 **Features:**
 - Upload files directly from your computer

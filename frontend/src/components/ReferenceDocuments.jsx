@@ -10,9 +10,26 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Size limits
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_CHARACTERS = 100000; // ~100k characters (roughly 25-50 pages)
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' bytes';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   const handleFileUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`File too large (${formatFileSize(file.size)}). Maximum size is ${formatFileSize(MAX_FILE_SIZE)}. Please use a smaller file or copy-paste the relevant sections.`);
+      event.target.value = '';
+      return;
+    }
 
     setIsUploading(true);
 
@@ -26,16 +43,36 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
         content = await file.text();
       } else if (fileExtension === 'pdf') {
         // For PDF, we'll try to extract text (basic approach)
-        alert('PDF files are supported but text extraction may be limited. For best results, copy-paste text from your PDF reader.');
+        alert('⚠️ PDF text extraction is limited.\n\nFor best results:\n1. Open your PDF\n2. Select and copy the text\n3. Use "Paste Text" option instead\n\nYou can continue, but text may not be extracted correctly.');
         content = await file.text(); // This won't work well for PDFs, but better than nothing
       } else if (['doc', 'docx'].includes(fileExtension)) {
-        alert('Word documents (.doc, .docx) are not directly supported. Please copy-paste the text or save as .txt first.');
+        alert('❌ Word documents not supported.\n\nPlease:\n1. Open your Word document\n2. Copy the text (Ctrl+A, Ctrl+C)\n3. Use "Paste Text" option instead\n\nOr save as .txt file first.');
         setIsUploading(false);
         event.target.value = ''; // Reset file input
         return;
       } else {
         // Try to read as text anyway
         content = await file.text();
+      }
+
+      // Check content length
+      if (content.length > MAX_CHARACTERS) {
+        const shouldContinue = confirm(
+          `⚠️ Large document (${content.length.toLocaleString()} characters)\n\n` +
+          `Recommended maximum: ${MAX_CHARACTERS.toLocaleString()} characters\n\n` +
+          `Large documents may:\n` +
+          `• Take longer to process\n` +
+          `• Exceed AI model context limits\n` +
+          `• Increase costs\n\n` +
+          `Recommended: Extract only relevant sections.\n\n` +
+          `Continue anyway?`
+        );
+        
+        if (!shouldContinue) {
+          setIsUploading(false);
+          event.target.value = '';
+          return;
+        }
       }
 
       // Auto-fill form with file content
@@ -45,7 +82,7 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
 
     } catch (error) {
       console.error('Error reading file:', error);
-      alert('Error reading file. Please try copying and pasting the content instead.');
+      alert('❌ Error reading file.\n\nPlease try:\n1. Copy text from the file\n2. Use "Paste Text" option instead');
     } finally {
       setIsUploading(false);
       event.target.value = ''; // Reset file input
@@ -108,6 +145,9 @@ export default function ReferenceDocuments({ onDocumentsChange }) {
               Add reference documents, policies, or context that the council should consider.
               These will be included in the analysis.
             </p>
+            <div className="reference-limits">
+              <strong>Limits:</strong> Max 5MB file size, ~100k characters recommended (~25-50 pages)
+            </div>
             <p className="reference-warning">
               ⚠️ <strong>Do NOT upload</strong> confidential or sensitive information.
             </p>
