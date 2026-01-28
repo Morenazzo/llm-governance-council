@@ -177,6 +177,9 @@ export default function ChatInterface({
               Send
             </button>
           </form>
+          <div className="disclaimer-footer">
+            ⚠️ This is not legal advice
+          </div>
         </div>
       )}
     </div>

@@ -167,3 +167,14 @@
   background: #ccc;
   border-color: #ccc;
 }
+
+.disclaimer-footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 13px;
+  color: #718096;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 12px;
+  border-radius: 0 0 8px 8px;
+}

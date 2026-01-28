@@ -6,22 +6,7 @@ LLM Governance Council
 
 A research prototype for Minimum Viable AI Governance via multi-model deliberation
 
----
-
-## ⚠️ IMPORTANT DISCLAIMER
-
-**This is a research prototype and decision-support tool. IT IS NOT LEGAL ADVICE.**
-
-- ❌ **Not a substitute** for professional legal, compliance, or governance counsel
-- ❌ **Not production-ready** - experimental software with known limitations
-- ❌ **No warranty** - provided "AS IS" without guarantees
-- ❌ **Do not input** confidential or sensitive information
-- ✅ **Always validate** recommendations with qualified professionals
-- ✅ **See [DISCLAIMER.md](DISCLAIMER.md)** for complete terms and limitations
-
-**BY USING THIS TOOL, YOU ACKNOWLEDGE THE RISKS AND LIMITATIONS.**
-
----
+⚠️ **This is not legal advice** - See [DISCLAIMER.md](DISCLAIMER.md) for complete terms
 
 Overview
 
