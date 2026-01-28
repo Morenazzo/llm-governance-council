@@ -159,9 +159,9 @@ The council consists of **5 specialized AI models**, each with a unique governan
 
 | Model | Role | Focus Area | Stages |
 |-------|------|------------|--------|
-| **ChatGPT-5.2** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
+| **GPT-5.2** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
 | **Gemini 3 Pro** | Systems Architect + Chairman | Architecture + final synthesis | 1, Delphi, 2, **3** |
-| **Claude Sonnet** | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
+| **Claude Sonnet 4.5** | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
 | **Grok 4** | Red Team | Adversarial review | 1, Delphi, 2 |
 | **Mistral Large** | Safety Engineer | Technical controls | 1, Delphi, 2 |
 
@@ -170,34 +170,39 @@ The council consists of **5 specialized AI models**, each with a unique governan
 - Only Gemini serves as Chairman for Stage 3 (final synthesis)
 - Each model brings a specialized perspective to reduce correlated failures
 
-### ChatGPT Integration
+### GPT-5.2 Integration
 
-ChatGPT serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on:
+GPT-5.2 serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on:
 - Integration risks and cross-component dependencies
 - Failure mode identification and cascade effects
 - Fault propagation paths
 - Resilience strategies
 - System-wide impact assessment
 
-**Configure ChatGPT-5.2 Model:**
+**Configure GPT-5.2 Model:**
 
-**CRITICAL**: ChatGPT-5.2 is intentionally selected for superior reasoning quality and systems analysis.
+**CRITICAL**: GPT-5.2 is intentionally selected for superior reasoning quality and systems analysis.
 
 ```bash
-# Default model - DO NOT change unless you have confirmed access
-CHATGPT_MODEL_ID=openai/chatgpt-5.2
+# Default model - CORRECT model ID is openai/gpt-5.2
+CHATGPT_MODEL_ID=openai/gpt-5.2
 
-# WARNING: Do NOT downgrade to chatgpt-4o
-# Downgrading reduces failure-mode analysis quality
+# WARNING: Do NOT use openai/chatgpt-5.2 (does not exist)
+# Do NOT downgrade to gpt-4o - reduces analysis quality
+
+# Other GPT-5 variants available on OpenRouter:
+# CHATGPT_MODEL_ID=openai/gpt-5.2-chat
+# CHATGPT_MODEL_ID=openai/gpt-5.2-pro
+# CHATGPT_MODEL_ID=openai/gpt-5.2-codex
 ```
 
-**Note**: ChatGPT-5.2 provides advanced reasoning capabilities critical for:
+**Note**: GPT-5.2 provides advanced reasoning capabilities critical for:
 - Complex system failure analysis
 - Multi-component integration risk assessment
 - Cascade effect prediction
 - Deep systems thinking
 
-Only modify if you have access to a different GPT-5 variant via OpenRouter.
+**Model ID Format**: Use `openai/gpt-5.2` (NOT `openai/chatgpt-5.2`).
 
 ### Mistral Integration
 
@@ -239,6 +244,46 @@ This test will:
 
 **Note:** Only one API key (OpenRouter) is required. All models, including Mistral, use OpenRouter as the gateway.
 
+### Delphi Mode (Optional)
+
+The system supports an optional **Delphi Mode** that adds an iterative reflection stage where models can revise their responses after seeing anonymized peer feedback.
+
+**Enable Delphi Mode:**
+
+```bash
+# In .env file
+DELPHI_MODE=true
+```
+
+**How It Works:**
+
+When Delphi Mode is enabled, a new Stage 1.5 is inserted between Stage 1 and Stage 2:
+
+1. **Stage 1**: Models generate initial responses independently
+2. **Stage 1.5 (Delphi Reflection)**: 
+   - Each model receives anonymized digest of peer responses
+   - Model decides to REVISE or AFFIRM its original response
+   - Provides justification for decision
+   - Generates Round 2 response (revised or reaffirmed)
+   - System detects material disagreements and high-risk triggers
+3. **Stage 2**: Models rank responses (using Round 2 if Delphi enabled)
+4. **Stage 3**: Chairman synthesizes final answer
+
+**Benefits:**
+- ✅ Models self-correct after seeing peer perspectives
+- ✅ Convergence toward better solutions through iteration
+- ✅ Detection of material disagreements requiring human review
+- ✅ Higher quality analysis at cost of longer processing time
+
+**Trade-offs:**
+
+| Mode | Processing Time | Analysis Depth | Use Case |
+|------|----------------|----------------|----------|
+| **Standard** | 5-7 minutes | Good | Quick governance decisions |
+| **Delphi** | 10-15 minutes | Excellent | Critical high-stakes decisions |
+
+**Recommendation**: Use Delphi Mode for complex, high-stakes governance decisions where superior analysis quality justifies the longer wait time.
+
 Running the Application
 Option 1 — Start Script
 ./start.sh
@@ -258,6 +303,27 @@ npm run dev
 
 Open:
 http://localhost:5173
+
+### Expected Processing Times
+
+**Standard Mode (DELPHI_MODE=false)**:
+- Stage 1 (Individual Responses): 2-3 minutes
+- Stage 2 (Peer Rankings): 2-3 minutes
+- Stage 3 (Final Synthesis): 30 seconds
+- **Total: ~5-7 minutes per query**
+
+**Delphi Mode (DELPHI_MODE=true)**:
+- Stage 1 (Round 1 Responses): 2-3 minutes
+- Stage 1.5 (Delphi Reflection): 3-5 minutes
+- Stage 2 (Peer Rankings): 2-3 minutes
+- Stage 3 (Final Synthesis): 30 seconds
+- **Total: ~10-15 minutes per query**
+
+**Important**: 
+- Do not refresh the page while processing
+- The UI will show loading indicators for each stage
+- Processing happens in parallel where possible
+- Times may vary based on query complexity and API response times
 
 Tech Stack
 
