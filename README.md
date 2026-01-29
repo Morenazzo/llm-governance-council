@@ -405,6 +405,9 @@ It has been independently modified and extended for AI governance and safety res
 
 No official support or maintenance is provided.
 
+## License
+This project is licensed under the MIT License.
+
 Final note
 
 If you are reading this repo expecting a polished product: this is not it.
