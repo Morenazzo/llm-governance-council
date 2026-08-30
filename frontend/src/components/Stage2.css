@@ -350,17 +350,118 @@
 }
 
 /* Extracted Ranking Section - Machine-Readable */
-.extracted-ranking-section {
-  background: #f5f5f5;
+/* Ballot Section - this reviewer's vote, at a glance */
+.ballot-section {
+  background: #f7f5ff;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border: 1px dashed #999;
+  border-left: 4px solid #764ba2;
 }
 
-.extracted-ranking-section .section-header {
-  color: #555;
+.ballot-section .section-header {
+  color: #764ba2;
   margin-top: 0;
+}
+
+.ballot-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ballot-card {
+  flex: 1 1 150px;
+  min-width: 150px;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-areas:
+    "rank model"
+    "rank role"
+    "rank tag";
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #e6e0f5;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.ballot-rank {
+  grid-area: rank;
+  align-self: center;
+  justify-self: center;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #b0aec2;
+}
+
+.ballot-card.rank-1 .ballot-rank { background: #d4a017; }
+.ballot-card.rank-2 .ballot-rank { background: #8c98a6; }
+.ballot-card.rank-3 .ballot-rank { background: #b07443; }
+
+.ballot-card.rank-1 {
+  border-color: #d4a017;
+  background: #fffdf5;
+}
+
+.ballot-model {
+  grid-area: model;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  overflow-wrap: anywhere;
+}
+
+.ballot-role {
+  grid-area: role;
+  font-size: 11px;
+  font-weight: 600;
+  color: #764ba2;
+}
+
+.ballot-tag {
+  grid-area: tag;
+  font-size: 10px;
+  color: #999;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.ballot-card.is-self {
+  border-style: dashed;
+  border-color: #c9a0dc;
+}
+
+.ballot-self {
+  color: #764ba2;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Collapsed raw data */
+.raw-data {
+  margin-top: 14px;
+}
+
+.raw-data > summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  padding: 4px 0;
+  user-select: none;
+}
+
+.raw-data > summary:hover {
+  color: #764ba2;
 }
 
 .machine-readable-format {

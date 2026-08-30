@@ -121,8 +121,7 @@ export default function Stage2({ rankings, labelToModel, responseMapping, counci
       response_id: responseId,
       model: member?.model || mappingData?.model || labelToModel?.[label] || label,
       role: member?.role || mappingData?.role || 'Council Member',
-      reviewer: currentRanking.model,
-      timestamp: new Date().toISOString()
+      reviewer: currentRanking.model
     };
   }) || [];
 
@@ -245,19 +244,42 @@ export default function Stage2({ rankings, labelToModel, responseMapping, counci
           </div>
         )}
 
-        {/* Extracted Ranking - Machine-Readable Format */}
-        {extractedRanking.length > 0 && (
-          <div className="extracted-ranking-section">
+        {/* This reviewer's ballot, at a glance */}
+        {finalRankingWithLabels.length > 0 && (
+          <div className="ballot-section">
             <h4 className="section-header">
-              <span className="section-icon">📊</span>
-              Extracted Ranking (Machine-Readable)
+              <span className="section-icon">🗳️</span>
+              This Reviewer's Ballot
             </h4>
             <p className="section-description">
-              Structured array format for downstream processing, analytics, and automation:
+              How <strong>{getModelShortName(currentRanking.model)}</strong> ordered the council,
+              best to worst:
             </p>
-            <pre className="machine-readable-format">
-              {JSON.stringify(extractedRanking, null, 2)}
-            </pre>
+            <div className="ballot-strip">
+              {finalRankingWithLabels.map((item) => {
+                const isSelf = item.fullModelName === currentRanking.model;
+                return (
+                  <div
+                    key={item.position}
+                    className={`ballot-card rank-${item.position <= 3 ? item.position : 'rest'}${isSelf ? ' is-self' : ''}`}
+                  >
+                    <span className="ballot-rank">{item.position}</span>
+                    <span className="ballot-model">{item.modelShortName}</span>
+                    <span className="ballot-role">{item.role}</span>
+                    <span className="ballot-tag">
+                      {item.anonymousLabel}
+                      {isSelf && <em className="ballot-self"> · itself</em>}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <details className="raw-data">
+              <summary>Machine-readable JSON (for audit &amp; automation)</summary>
+              <pre className="machine-readable-format">
+                {JSON.stringify(extractedRanking, null, 2)}
+              </pre>
+            </details>
           </div>
         )}
       </div>
