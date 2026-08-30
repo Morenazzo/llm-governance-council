@@ -7,7 +7,7 @@ import re
 from collections import defaultdict
 
 from .openrouter import query_models_parallel, query_model
-from .config import COUNCIL_MODELS, CHAIRMAN_MODEL, DELPHI_MODE
+from .config import COUNCIL_MODELS, CHAIRMAN_MODEL, TITLE_MODEL, DELPHI_MODE
 
 
 # =========================
@@ -23,7 +23,7 @@ class CouncilMember:
     to their originating models and governance roles.
     """
     id: str      # Anonymous identifier: A, B, C, D...
-    model: str   # Full model identifier: e.g., "openai/gpt-5.2"
+    model: str   # Full model identifier: e.g., "openai/gpt-5.6-sol"
     role: str    # Governance role: e.g., "Regulator", "Ethics Officer"
 
     def to_dict(self) -> Dict[str, str]:
@@ -42,24 +42,24 @@ class CouncilMember:
 # Governance role mapping
 # =========================
 
-# NOTE: Make sure these keys match your COUNCIL_MODELS values exactly.
-# For ChatGPT and Mistral, we match any model ID containing the keyword
+# NOTE: roles are keyed by VENDOR PREFIX, not by exact model id, so bumping a
+# model version in config.py never silently drops a seat's governance role.
 GOVERNANCE_ROLES = {
-    "anthropic/claude-sonnet-4.5": "Ethics Officer",
-    "google/gemini-3-pro-preview": "Systems Architect",
-    "x-ai/grok-4": "Red Team",
+    "openai/": "Systems Integrator",
+    "google/": "Systems Architect",
+    "anthropic/": "Ethics Officer",
+    "x-ai/": "Red Team",
+    "mistralai/": "Safety Engineer",
 }
 
 def get_governance_role(model: str) -> str:
-    """Get governance role for a model, with fallbacks for ChatGPT and Mistral variants."""
-    # Check exact match first
-    if model in GOVERNANCE_ROLES:
-        return GOVERNANCE_ROLES[model]
-    # Check if it's a ChatGPT variant (openai/chatgpt-* or openai/gpt-*)
-    if "openai/" in model.lower() and ("chatgpt" in model.lower() or "gpt" in model.lower()):
-        return "Systems Integrator"
-    # Check if it's a Mistral variant
-    if "mistral" in model.lower():
+    """Get the governance role for a model id, matching on its vendor prefix."""
+    model_id = model.lower()
+    for prefix, role in GOVERNANCE_ROLES.items():
+        if model_id.startswith(prefix):
+            return role
+    # Legacy ids sin prefijo canonico (p.ej. "mistral-large" suelto)
+    if "mistral" in model_id:
         return "Safety Engineer"
     return "Council Member"
 
@@ -78,20 +78,21 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
       council_members: [CouncilMember(...)]
     """
     # Role-aware prompts to reduce correlated failure modes.
+    # Keyed by vendor prefix so a model upgrade keeps its seat's role prompt.
     SAFETY_ROLES = {
-        "anthropic/claude-sonnet-4.5": (
+        "anthropic/": (
             "You are an ethical analyst focused on alignment, responsible AI behavior, and "
             "downstream impacts."
         ),
-        "google/gemini-3-pro-preview": (
+        "google/": (
             "You are a systems architect optimizing for clarity, robustness, and comprehensive "
             "system design. You will also serve as the Chairman to synthesize final recommendations."
         ),
-        "x-ai/grok-4": (
+        "x-ai/": (
             "You are a critical adversarial reviewer actively searching for flaws, edge cases, and hidden risks."
         ),
     }
-    
+
     # ChatGPT role definition (matches openai/chatgpt-* or openai/gpt-*)
     CHATGPT_ROLE = (
         "You are a Systems Integrator & Failure-Mode Analyst. Your expertise is in identifying how "
@@ -111,17 +112,19 @@ async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]
 
     tasks = []
     for model in COUNCIL_MODELS:
-        # Get role prefix - check exact match first, then ChatGPT/Mistral fallbacks
-        role_prefix = SAFETY_ROLES.get(model)
-        
+        # Match the seat by vendor prefix (works across model version bumps)
+        model_id = model.lower()
+        role_prefix = next(
+            (prompt for prefix, prompt in SAFETY_ROLES.items() if model_id.startswith(prefix)),
+            None,
+        )
+
         if not role_prefix:
-            # Check for ChatGPT variants
-            if "openai/" in model.lower() and ("chatgpt" in model.lower() or "gpt" in model.lower()):
+            if model_id.startswith("openai/"):
                 role_prefix = CHATGPT_ROLE
-            # Check for Mistral variants
-            elif "mistral" in model.lower():
+            elif "mistral" in model_id:
                 role_prefix = MISTRAL_ROLE
-        
+
         content = f"{role_prefix}\n\n{user_query}" if role_prefix else user_query
         messages = [{"role": "user", "content": content}]
         tasks.append(query_model(model, messages))
@@ -602,7 +605,7 @@ Question: {user_query}
 Title:"""
 
     messages = [{"role": "user", "content": title_prompt}]
-    resp = await query_model("google/gemini-2.5-flash", messages, timeout=30.0)
+    resp = await query_model(TITLE_MODEL, messages, timeout=30.0)
 
     if resp is None:
         return "New Conversation"

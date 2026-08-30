@@ -14,7 +14,7 @@ async def query_model(
     Query a single model via OpenRouter API.
 
     Args:
-        model: OpenRouter model identifier (e.g., "openai/gpt-4o")
+        model: OpenRouter model identifier (e.g., "openai/gpt-5.6-sol")
         messages: List of message dicts with 'role' and 'content'
         timeout: Request timeout in seconds
 
