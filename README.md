@@ -146,65 +146,74 @@ Then edit `.env` and replace `your_api_key_here` with your actual OpenRouter API
 You can customize council members and the Chairman in backend/config.py:
 
 COUNCIL_MODELS = [
-    CHATGPT_MODEL_ID,   # ChatGPT model (configurable)
-    "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
-    "x-ai/grok-4",
-    MISTRAL_MODEL_ID,   # Mistral model (configurable)
+    CHATGPT_MODEL_ID,   # OpenAI seat   (configurable)
+    GEMINI_MODEL_ID,    # Google seat   (configurable)
+    CLAUDE_MODEL_ID,    # Anthropic seat (configurable)
+    GROK_MODEL_ID,      # xAI seat      (configurable)
+    MISTRAL_MODEL_ID,   # Mistral seat  (configurable)
 ]
 
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+CHAIRMAN_MODEL = os.getenv("CHAIRMAN_MODEL", GEMINI_MODEL_ID)
+
+Every seat can be overridden from `.env` without touching code (see `.env.example`).
+Governance roles are assigned by **vendor prefix**, so bumping a model version
+never silently drops a seat's role.
 
 ### Council Members & Roles
 
 The council consists of **5 specialized AI models**, each with a unique governance role:
 
-| Model | Role | Focus Area | Stages |
-|-------|------|------------|--------|
-| **GPT-5.2** | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
-| **Gemini 3 Pro** | Systems Architect + Chairman | Architecture + final synthesis | 1, Delphi, 2, **3** |
-| **Claude Sonnet 4.5** | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
-| **Grok 4** | Red Team | Adversarial review | 1, Delphi, 2 |
-| **Mistral Large** | Safety Engineer | Technical controls | 1, Delphi, 2 |
+| Model | OpenRouter ID | Role | Focus Area | Stages |
+|-------|---------------|------|------------|--------|
+| **GPT-5.6 Sol** | `openai/gpt-5.6-sol` | Systems Integrator | Integration risks & failure modes | 1, Delphi, 2 |
+| **Gemini 3.1 Pro** | `google/gemini-3.1-pro-preview` | Systems Architect + Chairman | Architecture + final synthesis | 1, Delphi, 2, **3** |
+| **Claude Opus 5** | `anthropic/claude-opus-5` | Ethics Officer | Ethics & alignment | 1, Delphi, 2 |
+| **Grok 4.6** | `x-ai/grok-4.6` | Red Team | Adversarial review | 1, Delphi, 2 |
+| **Mistral Medium 3.5** | `mistralai/mistral-medium-3-5` | Safety Engineer | Technical controls | 1, Delphi, 2 |
+
+Roster verified against the live OpenRouter catalog on 2026-08-29.
+`mistralai/mistral-large-2512` is the stronger Mistral but returned HTTP 429 (no
+upstream capacity for this account), so the Mistral seat defaults to Medium 3.5.
 
 **Key Points**:
 - All 5 models participate in Stage 1 (individual responses), Delphi (iterative reflection), and Stage 2 (peer rankings)
 - Only Gemini serves as Chairman for Stage 3 (final synthesis)
 - Each model brings a specialized perspective to reduce correlated failures
 
-### GPT-5.2 Integration
+### OpenAI Seat (GPT-5.6 Sol)
 
-GPT-5.2 serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on:
+GPT-5.6 Sol serves as the **Systems Integrator & Failure-Mode Analyst**, focusing on:
 - Integration risks and cross-component dependencies
 - Failure mode identification and cascade effects
 - Fault propagation paths
 - Resilience strategies
 - System-wide impact assessment
 
-**Configure GPT-5.2 Model:**
+**Configure the OpenAI Model:**
 
-**CRITICAL**: GPT-5.2 is intentionally selected for superior reasoning quality and systems analysis.
+**CRITICAL**: the flagship of the series is intentionally selected for superior
+reasoning quality and systems analysis.
 
 ```bash
-# Default model - CORRECT model ID is openai/gpt-5.2
-CHATGPT_MODEL_ID=openai/gpt-5.2
+# Default model - Sol is the flagship tier of the GPT-5.6 series
+CHATGPT_MODEL_ID=openai/gpt-5.6-sol
 
-# WARNING: Do NOT use openai/chatgpt-5.2 (does not exist)
-# Do NOT downgrade to gpt-4o - reduces analysis quality
+# WARNING: do NOT downgrade to gpt-4o or gpt-5.2 - reduces analysis quality
 
-# Other GPT-5 variants available on OpenRouter:
-# CHATGPT_MODEL_ID=openai/gpt-5.2-chat
-# CHATGPT_MODEL_ID=openai/gpt-5.2-pro
-# CHATGPT_MODEL_ID=openai/gpt-5.2-codex
+# Other GPT-5.6 variants available on OpenRouter:
+# CHATGPT_MODEL_ID=openai/gpt-5.6-terra      # balanced tier
+# CHATGPT_MODEL_ID=openai/gpt-5.6-luna       # fast and cheap
+# CHATGPT_MODEL_ID=openai/gpt-5.6-terra-pro  # Terra with reasoning.mode=pro
+# CHATGPT_MODEL_ID=openai/gpt-5.5-pro        # extended reasoning, much pricier
 ```
 
-**Note**: GPT-5.2 provides advanced reasoning capabilities critical for:
+**Note**: this seat provides advanced reasoning capabilities critical for:
 - Complex system failure analysis
 - Multi-component integration risk assessment
 - Cascade effect prediction
 - Deep systems thinking
 
-**Model ID Format**: Use `openai/gpt-5.2` (NOT `openai/chatgpt-5.2`).
+**Model ID Format**: use the full `vendor/model` slug, e.g. `openai/gpt-5.6-sol`.
 
 ### Mistral Integration
 
@@ -221,11 +230,11 @@ You can specify which Mistral model to use via the `MISTRAL_MODEL_ID` environmen
 
 ```bash
 # Default model (if not specified)
-MISTRAL_MODEL_ID=mistralai/mistral-large-2407
+MISTRAL_MODEL_ID=mistralai/mistral-medium-3-5
 
 # Other options available on OpenRouter:
-# MISTRAL_MODEL_ID=mistralai/mistral-medium
-# MISTRAL_MODEL_ID=mistralai/mistral-small
+# MISTRAL_MODEL_ID=mistralai/mistral-large-2512   # stronger, but 429 on this account
+# MISTRAL_MODEL_ID=mistralai/mistral-small-2603
 ```
 
 See [OpenRouter Models](https://openrouter.ai/models) for all available Mistral variants.
